@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:llm_app/blocs/blocs.dart';
+import 'package:llm_app/blocs/page.dart';
+import 'package:llm_app/models.dart';
+import 'package:llm_app/ui/login_page/login_page.dart';
+import 'package:llm_app/ui/drawer/drawer.dart';
+import 'package:llm_app/ui/session_page/session_page.dart';
+import 'package:llm_app/utils.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,43 +18,26 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => UserBloc()),
+          BlocProvider(create: (_) => SessionBloc()),
+          BlocProvider(create: (_) => ChatBloc()),
+          BlocProvider(create: (_) => PageBloc()),
+        ],
+        child: MaterialApp(
+          title: 'LLM App Example',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
+          home: const MyHomePage(title: 'LLM App Home Page'),
+        ));
   }
 }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
@@ -55,71 +46,161 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  String? _token;
+  String? _refreshToken;
+  User? _profile;
+  bool _init = true;
+  // bool _startRewind = false;
+  UserEvent? _rewindUser;
+  SessionEvent? _rewindSession;
+  ChatEvent? _rewindChat;
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+    final userBloc = BlocProvider.of<UserBloc>(context);
+    final sessionBloc = BlocProvider.of<SessionBloc>(context);
+    final chatBloc = BlocProvider.of<ChatBloc>(context);
+    final pageBloc = BlocProvider.of<PageBloc>(context);
+
+    if (_init) {
+      pageBloc.add(SwitchLogin());
+    }
+    _init = false;
+
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<SessionBloc, GeneralState<SessionState>>(
+          // listenWhen: (previous, current) {
+          //   return current is TokenExpired<SessionState, SessionEvent>;
+          // },
+          listener: (context, state) {
+            if (state is TokenExpired<SessionState, SessionEvent>) {
+              showTokenExpiredSnackbar(context);
+              _rewindSession = state.event;
+              userBloc.add(Refresh(_refreshToken!));
+              sessionBloc.add(SessionReset());
+            }
+          },
         ),
+        BlocListener<ChatBloc, GeneralState<ChatState>>(
+          // listenWhen: (previous, current) {
+          //   return current is TokenExpired<ChatState, ChatEvent>;
+          // },
+          listener: (context, state) {
+            if (state is TokenExpired<ChatState, ChatEvent>) {
+              showTokenExpiredSnackbar(context);
+              _rewindChat = state.event;
+              userBloc.add(Refresh(_refreshToken!));
+              chatBloc.add(ChatReset());
+            }
+          },
+        ),
+        BlocListener<UserBloc, GeneralState<UserState>>(
+          listener: (context, state) {
+            if (state is RequestSuccess<UserState, UserLoginResponse>) {
+              setState(() {
+                _token = state.resp.token;
+                _refreshToken = state.resp.refreshToken;
+              });
+              userBloc.add(Profile(_token!));
+              pageBloc.add(SwitchSession());
+            } else if (state is RequestSuccess<UserState, User>) {
+              setState(() {
+                _profile = state.resp;
+              });
+            } else if (state is TokenExpired<UserState, Refresh>) {
+              userBloc.add(LoginAgain());
+            } else if (state is TokenExpired<UserState, UserEvent>) {
+              showTokenExpiredSnackbar(context);
+              _rewindUser = state.event;
+              userBloc.add(Refresh(_refreshToken!));
+            } else if (state is UserLoginAgain) {
+              setState(() {
+                _token = null;
+                _refreshToken = null;
+              });
+              generalAlert(context, 'Login Again',
+                  'Your refresh token has expired, please login again.');
+              pageBloc.add(SwitchLogin());
+            } else if (state is UserLogout) {
+              setState(() {
+                _token = null;
+                _refreshToken = null;
+              });
+              pageBloc.add(SwitchLogin());
+            } else if (state is UserTokenRefreshed) {
+              setState(() {
+                _token = state.token;
+              });
+              if (_rewindUser != null) {
+                userBloc.add(UserRewind(state.token, _rewindUser!));
+                _rewindUser = null;
+              }
+              if (_rewindSession != null) {
+                sessionBloc.add(SessionRewind(state.token, _rewindSession!));
+                _rewindUser = null;
+              }
+              if (_rewindChat != null) {
+                chatBloc.add(ChatRewind(state.token, _rewindChat!));
+                _rewindChat = null;
+              }
+              showTokenRefreshedSnackbar(context);
+              // } else if (state is UserNeedRefresh) {
+              //   userBloc.add(Refresh(_refreshToken!));
+            }
+          },
+        ),
+      ],
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('LLM Test App'),
+          // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        ),
+        drawer: (_profile != null && _token != null)
+            ? MainDrawer(_token!, _profile!)
+            : null,
+        body: BlocBuilder<PageBloc, PageState>(
+          builder: (context, state) {
+            switch (state) {
+              case PageState.login:
+                return const LoginPage();
+              case PageState.session:
+                return SessionPage(
+                  token: _token!,
+                );
+              default:
+                return const Placeholder();
+            }
+          },
+        ),
+        floatingActionButton:
+            BlocBuilder<PageBloc, PageState>(builder: (context, state) {
+          switch (state) {
+            case PageState.session:
+              return FloatingActionButton(
+                onPressed: () {
+                  BlocProvider.of<SessionBloc>(context)
+                      .add(SessionCreate(_token!));
+                },
+                tooltip: 'Create session',
+                child: const Icon(Icons.add),
+              );
+            default:
+              return Container();
+          }
+        }),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+class Placeholder extends StatelessWidget {
+  const Placeholder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text('This is a placeholder.'),
     );
   }
 }

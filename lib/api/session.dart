@@ -9,10 +9,10 @@ Future<Either<ErrorResponse, SessionListResponse>> sessionList(
   String token,
 ) async {
   return genericRequest(
-    "GET",
-    "session/list",
+    'GET',
+    'session/list',
     null,
-    {"Authorization": "Bearer $token"},
+    {'Authorization': 'Bearer $token'},
     (body) => SessionListResponse.fromJson(jsonDecode(body)),
   );
 }
@@ -21,27 +21,28 @@ Future<Either<ErrorResponse, SessionCreateResponse>> sessionCreate(
   String token,
 ) async {
   return genericRequest(
-    "PUT",
-    "session/create",
+    'PUT',
+    'session/create',
     null,
-    {"Authorization": "Bearer $token"},
+    {'Authorization': 'Bearer $token'},
     (body) => SessionCreateResponse.fromJson(jsonDecode(body)),
   );
 }
 
-Future<Either<ErrorResponse, Null>> sessionDelete(
+Future<Either<ErrorResponse, SessionDeleteResponse>> sessionDelete(
   String token,
   String sessionId,
 ) async {
   if (!Uuid.isValidUUID(fromString: sessionId)) {
-    return Left(ErrorResponse("Session id is not a valid UUID", false));
+    return Left(ErrorResponse('Session id is not a valid UUID', false));
   }
 
-  return nullRequest(
-    "DELETE",
-    "session/delete/$sessionId",
+  return genericRequest(
+    'DELETE',
+    'session/delete/$sessionId',
     null,
-    {"Authorization": "Bearer $token"},
+    {'Authorization': 'Bearer $token'},
+    (_) => SessionDeleteResponse(sessionId),
   );
 }
 
@@ -50,14 +51,14 @@ Future<Either<ErrorResponse, SessionGetResponse>> sessionGet(
   String sessionId,
 ) async {
   if (!Uuid.isValidUUID(fromString: sessionId)) {
-    return Left(ErrorResponse("Session id is not a valid UUID", false));
+    return Left(ErrorResponse('Session id is not a valid UUID', false));
   }
 
   return genericRequest(
-    "PUT",
-    "session/$sessionId",
+    'GET',
+    'session/$sessionId',
     null,
-    {"Authorization": "Bearer $token"},
+    {'Authorization': 'Bearer $token'},
     (body) => SessionGetResponse.fromJson(jsonDecode(body)),
   );
 }

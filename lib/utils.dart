@@ -1,10 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:either_dart/either.dart';
 import 'package:llm_app/models.dart';
 
-const apiBase = "localhost:8080";
+const apiBase = 'localhost:8080';
 typedef JsonObject = Map<String, dynamic>;
 
 T? cast<T>(x) => x is T ? x : null;
@@ -15,7 +16,7 @@ Future<Either<ErrorResponse, Response>> generalRequest<T>(
   Object? body,
   Map<String, String>? headers,
 ) async {
-  var req = Request(method, Uri.http(apiBase, "api/$endpoint"));
+  var req = Request(method, Uri.http(apiBase, 'api/$endpoint'));
   if (headers != null) {
     headers.forEach((k, v) => req.headers[k] = v);
   }
@@ -32,6 +33,7 @@ Future<Either<ErrorResponse, Response>> generalRequest<T>(
 
   final resp = await Response.fromStream(await result.right);
   if (resp.statusCode < 200 || resp.statusCode >= 300) {
+    print(resp.body);
     final body = ErrorResponse.fromJson(jsonDecode(resp.body));
     final error =
         'API Request to endpoint "$endpoint" failed with status ${resp.statusCode}: ${body.error}';
@@ -57,7 +59,7 @@ Future<Either<ErrorResponse, T>> genericRequest<T>(
   final parseResult = Either.tryExcept(() => bodyParser(resp.body));
 
   if (parseResult.isLeft) {
-    return Left(ErrorResponse("${parseResult.left}", false));
+    return Left(ErrorResponse('${parseResult.left}', false));
   } else {
     return Right(parseResult.right);
   }
@@ -76,4 +78,58 @@ Future<Either<ErrorResponse, Null>> nullRequest(
   }
 
   return const Right(null);
+}
+
+Future<T?> generalAlert<T>(BuildContext context, String title, String content) {
+  return showDialog<T>(
+      context: context,
+      builder: (context) => AlertDialog(
+            title: Text(title),
+            content: Text(content),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ));
+}
+
+Future<bool> retryAlert(
+    BuildContext context, String title, String content) async {
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(title),
+      content: Text(content),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: const Text('Retry'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('Cancel'),
+        ),
+      ],
+    ),
+  );
+
+  return result != null && result;
+}
+
+void showTokenExpiredSnackbar(BuildContext context) {
+  final tokenAlert = SnackBar(
+    content: const Text('Token expired, refresh...'),
+    action: SnackBarAction(label: 'OK', onPressed: () {}),
+  );
+  ScaffoldMessenger.of(context).showSnackBar(tokenAlert);
+}
+
+void showTokenRefreshedSnackbar(BuildContext context) {
+  final tokenAlert = SnackBar(
+    content: const Text('Token refreshed'),
+    action: SnackBarAction(label: 'OK', onPressed: () {}),
+  );
+  ScaffoldMessenger.of(context).showSnackBar(tokenAlert);
 }

@@ -30,7 +30,7 @@ User _$UserFromJson(Map<String, dynamic> json) => $checkedCreate(
       json,
       ($checkedConvert) {
         final val = User(
-          $checkedConvert('uuid', (v) => v as String),
+          $checkedConvert('uuid', (v) => v as String?),
           $checkedConvert('name', (v) => v as String),
           $checkedConvert('email', (v) => v as String),
         );
@@ -114,6 +114,7 @@ Session _$SessionFromJson(Map<String, dynamic> json) => $checkedCreate(
           $checkedConvert('uuid', (v) => v as String),
           $checkedConvert('uid', (v) => v as String),
           $checkedConvert('caption', (v) => v as String),
+          $checkedConvert('created_at', (v) => (v as num).toInt()),
           $checkedConvert(
               'messages',
               (v) =>
@@ -124,12 +125,14 @@ Session _$SessionFromJson(Map<String, dynamic> json) => $checkedCreate(
         );
         return val;
       },
+      fieldKeyMap: const {'createdAt': 'created_at'},
     );
 
 Map<String, dynamic> _$SessionToJson(Session instance) => <String, dynamic>{
       'uuid': instance.uuid,
       'uid': instance.uid,
       'caption': instance.caption,
+      'created_at': instance.createdAt,
       'messages': instance.messages,
     };
 
@@ -162,16 +165,38 @@ SessionCreateResponse _$SessionCreateResponseFromJson(
       json,
       ($checkedConvert) {
         final val = SessionCreateResponse(
-          $checkedConvert('id', (v) => v as String),
+          $checkedConvert(
+              'created', (v) => Session.fromJson(v as Map<String, dynamic>)),
         );
         return val;
       },
+      fieldKeyMap: const {'session': 'created'},
     );
 
 Map<String, dynamic> _$SessionCreateResponseToJson(
         SessionCreateResponse instance) =>
     <String, dynamic>{
-      'id': instance.id,
+      'created': instance.session,
+    };
+
+SessionDeleteResponse _$SessionDeleteResponseFromJson(
+        Map<String, dynamic> json) =>
+    $checkedCreate(
+      'SessionDeleteResponse',
+      json,
+      ($checkedConvert) {
+        final val = SessionDeleteResponse(
+          $checkedConvert('deleted_id', (v) => v as String),
+        );
+        return val;
+      },
+      fieldKeyMap: const {'deletedId': 'deleted_id'},
+    );
+
+Map<String, dynamic> _$SessionDeleteResponseToJson(
+        SessionDeleteResponse instance) =>
+    <String, dynamic>{
+      'deleted_id': instance.deletedId,
     };
 
 SessionGetResponse _$SessionGetResponseFromJson(Map<String, dynamic> json) =>
@@ -222,7 +247,10 @@ ChatProgress _$ChatProgressFromJson(Map<String, dynamic> json) =>
       ($checkedConvert) {
         final val = ChatProgress(
           $checkedConvert(
-              'data', (v) => ChatData.fromJson(v as Map<String, dynamic>)),
+              'data',
+              (v) => v == null
+                  ? null
+                  : ChatData.fromJson(v as Map<String, dynamic>)),
           $checkedConvert('error', (v) => v as String?),
           $checkedConvert('end', (v) => v as bool),
         );

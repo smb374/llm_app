@@ -1,12 +1,13 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
+import 'package:equatable/equatable.dart';
 
 part 'models.g.dart';
 
 // General
 // ErrorResponse: for all errors from API return.
 @JsonSerializable(checked: true)
-class ErrorResponse {
+class ErrorResponse with EquatableMixin {
   final String error;
 
   @JsonKey(defaultValue: false)
@@ -18,13 +19,16 @@ class ErrorResponse {
       _$ErrorResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$ErrorResponseToJson(this);
+
+  @override
+  List<Object?> get props => [error, refresh];
 }
 
 // User
 // User
 @JsonSerializable(checked: true)
-class User {
-  final String uuid;
+class User with EquatableMixin {
+  final String? uuid;
   final String name;
   final String email;
 
@@ -33,22 +37,25 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) {
     final user = _$UserFromJson(json);
 
-    if (!Uuid.isValidUUID(fromString: user.uuid)) {
-      throw Exception("Failed to parse user: Invalid uuid");
+    if (user.uuid != null && !Uuid.isValidUUID(fromString: user.uuid!)) {
+      throw Exception('Failed to parse user: Invalid uuid');
     }
 
     return user;
   }
 
   Map<String, dynamic> toJson() => _$UserToJson(this);
+
+  @override
+  List<Object?> get props => [uuid, name, email];
 }
 
 // UserLoginResponse
 @JsonSerializable(checked: true)
-class UserLoginResponse {
+class UserLoginResponse with EquatableMixin {
   final String token;
 
-  @JsonKey(name: "refreshtoken")
+  @JsonKey(name: 'refreshtoken')
   final String refreshToken;
 
   UserLoginResponse(this.token, this.refreshToken);
@@ -57,12 +64,21 @@ class UserLoginResponse {
       _$UserLoginResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserLoginResponseToJson(this);
+
+  @override
+  List<Object?> get props => [token, refreshToken];
+}
+
+// UserRegisterResponse
+class UserRegisterResponse with EquatableMixin {
+  @override
+  List<Object?> get props => [];
 }
 
 // UserRefreshResponse
 @JsonSerializable(checked: true)
-class UserRefreshResponse {
-  @JsonKey(name: "new_token")
+class UserRefreshResponse with EquatableMixin {
+  @JsonKey(name: 'new_token')
   final String newToken;
 
   UserRefreshResponse(this.newToken);
@@ -71,22 +87,25 @@ class UserRefreshResponse {
       _$UserRefreshResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserRefreshResponseToJson(this);
+
+  @override
+  List<Object?> get props => [newToken];
 }
 
 // Session
 // MessageRole
 enum MessageRole {
-  @JsonValue("user")
+  @JsonValue('user')
   user,
-  @JsonValue("assistant")
+  @JsonValue('assistant')
   assistant,
-  @JsonValue("system")
+  @JsonValue('system')
   system,
 }
 
 // Message
 @JsonSerializable(checked: true)
-class Message {
+class Message with EquatableMixin {
   final MessageRole role;
   final String content;
 
@@ -96,39 +115,48 @@ class Message {
       _$MessageFromJson(json);
 
   Map<String, dynamic> toJson() => _$MessageToJson(this);
+
+  @override
+  List<Object?> get props => [role, content];
 }
 
 // Session
 @JsonSerializable(checked: true)
-class Session {
+class Session with EquatableMixin {
   final String uuid;
   final String uid;
   String caption;
 
+  @JsonKey(name: 'created_at')
+  final int createdAt;
+
   @JsonKey(defaultValue: [])
   List<Message> messages;
 
-  Session(this.uuid, this.uid, this.caption, this.messages);
+  Session(this.uuid, this.uid, this.caption, this.createdAt, this.messages);
 
   factory Session.fromJson(Map<String, dynamic> json) {
     final session = _$SessionFromJson(json);
 
     if (!Uuid.isValidUUID(fromString: session.uuid)) {
-      throw Exception("Failed to parse session: Invalid uuid");
+      throw Exception('Failed to parse session: Invalid uuid');
     }
     if (!Uuid.isValidUUID(fromString: session.uid)) {
-      throw Exception("Failed to parse session: Invalid uid");
+      throw Exception('Failed to parse session: Invalid uid');
     }
 
     return session;
   }
 
   Map<String, dynamic> toJson() => _$SessionToJson(this);
+
+  @override
+  List<Object?> get props => [uuid, uid, caption, messages];
 }
 
 // SessionListResponse
 @JsonSerializable(checked: true)
-class SessionListResponse {
+class SessionListResponse with EquatableMixin {
   final List<Session> sessions;
 
   SessionListResponse(this.sessions);
@@ -137,36 +165,53 @@ class SessionListResponse {
     try {
       return _$SessionListResponseFromJson(json);
     } catch (e) {
-      throw Exception("Failed to parse session list response: $e");
+      throw Exception('Failed to parse session list response: $e');
     }
   }
 
   Map<String, dynamic> toJson() => _$SessionListResponseToJson(this);
+
+  @override
+  List<Object?> get props => [sessions];
 }
 
 // SessionCreateResponse
 @JsonSerializable(checked: true)
-class SessionCreateResponse {
-  final String id;
+class SessionCreateResponse with EquatableMixin {
+  @JsonKey(name: 'created')
+  final Session session;
 
-  SessionCreateResponse(this.id);
+  SessionCreateResponse(this.session);
 
-  factory SessionCreateResponse.fromJson(Map<String, dynamic> json) {
-    final result = _$SessionCreateResponseFromJson(json);
-
-    if (!Uuid.isValidUUID(fromString: result.id)) {
-      throw Exception("Failed to parse session create response: Invalid id");
-    }
-
-    return result;
-  }
+  factory SessionCreateResponse.fromJson(Map<String, dynamic> json) =>
+      _$SessionCreateResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$SessionCreateResponseToJson(this);
+
+  @override
+  List<Object?> get props => [session];
+}
+
+// SessionDeleteResponse
+@JsonSerializable(checked: true)
+class SessionDeleteResponse with EquatableMixin {
+  @JsonKey(name: 'deleted_id')
+  final String deletedId;
+
+  SessionDeleteResponse(this.deletedId);
+
+  factory SessionDeleteResponse.fromJson(Map<String, dynamic> json) =>
+      _$SessionDeleteResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SessionDeleteResponseToJson(this);
+
+  @override
+  List<Object?> get props => [deletedId];
 }
 
 // SessionGetResponse
 @JsonSerializable(checked: true)
-class SessionGetResponse {
+class SessionGetResponse with EquatableMixin {
   final Session session;
 
   SessionGetResponse(this.session);
@@ -175,20 +220,23 @@ class SessionGetResponse {
     try {
       return _$SessionGetResponseFromJson(json);
     } catch (e) {
-      throw Exception("Failed to parse session get response: $e");
+      throw Exception('Failed to parse session get response: $e');
     }
   }
 
   Map<String, dynamic> toJson() => _$SessionGetResponseToJson(this);
+
+  @override
+  List<Object?> get props => [session];
 }
 
 // Chat
 // ChatData
 @JsonSerializable(checked: true)
-class ChatData {
+class ChatData with EquatableMixin {
   final String model;
 
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   final String createdAt;
 
   final Message message;
@@ -202,12 +250,15 @@ class ChatData {
       _$ChatDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$ChatDataToJson(this);
+
+  @override
+  List<Object?> get props => [model, createdAt, message, done];
 }
 
 // ChatProgress
 @JsonSerializable(checked: true)
-class ChatProgress {
-  final ChatData data;
+class ChatProgress with EquatableMixin {
+  final ChatData? data;
   final String? error;
   final bool end;
 
@@ -217,12 +268,15 @@ class ChatProgress {
       _$ChatProgressFromJson(json);
 
   Map<String, dynamic> toJson() => _$ChatProgressToJson(this);
+
+  @override
+  List<Object?> get props => [data, error, end];
 }
 
 // ProgressResponse
 @JsonSerializable(checked: true)
-class ProgressResponse {
-  @JsonKey(name: "status_id")
+class ProgressResponse with EquatableMixin {
+  @JsonKey(name: 'status_id')
   final String statusId;
 
   ProgressResponse(this.statusId);
@@ -231,4 +285,7 @@ class ProgressResponse {
       _$ProgressResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$ProgressResponseToJson(this);
+
+  @override
+  List<Object?> get props => [statusId];
 }
