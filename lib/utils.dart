@@ -33,7 +33,7 @@ Future<Either<ErrorResponse, Response>> generalRequest<T>(
 
   final resp = await Response.fromStream(await result.right);
   if (resp.statusCode < 200 || resp.statusCode >= 300) {
-    print(resp.body);
+    // print(resp.body);
     final body = ErrorResponse.fromJson(jsonDecode(resp.body));
     final error =
         'API Request to endpoint "$endpoint" failed with status ${resp.statusCode}: ${body.error}';
