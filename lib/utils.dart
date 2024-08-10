@@ -5,7 +5,7 @@ import 'package:http/http.dart';
 import 'package:either_dart/either.dart';
 import 'package:llm_app/models.dart';
 
-const apiBase = 'localhost:8080';
+const apiBase = 'localhost:8888';
 typedef JsonObject = Map<String, dynamic>;
 
 T? cast<T>(x) => x is T ? x : null;

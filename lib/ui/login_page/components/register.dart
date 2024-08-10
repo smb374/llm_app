@@ -29,6 +29,10 @@ class _RegisterContentState extends State<RegisterContent> {
         if (state is RequestFailed<UserState, Register>) {
           setState(() {
             _inProgress = false;
+            _name = const NonEmptyInput.pure();
+            _email = const EmailInput.pure();
+            _password = const PasswordInput.pure();
+            _confirm = const ConfirmPasswordInput.pure();
           });
           generalAlert(context, 'Register Failed', state.error);
         } else if (state is RequestInProgress<UserState, Register>) {
@@ -38,6 +42,10 @@ class _RegisterContentState extends State<RegisterContent> {
         } else {
           setState(() {
             _inProgress = false;
+            _name = const NonEmptyInput.pure();
+            _email = const EmailInput.pure();
+            _password = const PasswordInput.pure();
+            _confirm = const ConfirmPasswordInput.pure();
           });
         }
       },
@@ -145,7 +153,9 @@ class _RegisterContentState extends State<RegisterContent> {
                   _password.error != PasswordValidationError.empty &&
                   _confirm.isValid) {
                 BlocProvider.of<UserBloc>(context)
-                    .add(Login(_email.value, _password.value));
+                    .add(Register(_name.value, _email.value, _password.value));
+                // BlocProvider.of<UserBloc>(context)
+                //     .add(Login(_email.value, _password.value));
               }
             },
             child: _inProgress
