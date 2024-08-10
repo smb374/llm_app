@@ -26,7 +26,7 @@ Future<Either<ErrorResponse, Stream<ChatProgress>>> chatProgress(
   String token,
   String statusId,
 ) async {
-  final uri = Uri.parse('ws://$apiBase/api/chat/status/$statusId');
+  final uri = Uri.parse('wss://$apiBase/api/chat/status/$statusId');
   final result = Either.tryExcept(() => IOWebSocketChannel.connect(
         uri,
         headers: {'Authorization': 'Bearer $token'},

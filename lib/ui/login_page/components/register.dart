@@ -49,124 +49,128 @@ class _RegisterContentState extends State<RegisterContent> {
           });
         }
       },
-      child: Column(
-        children: [
-          TextField(
-            decoration: InputDecoration(
-              labelText: 'Name',
-              helperText: _name.isPure
-                  ? null
-                  : _name.error == NonEmptyValidationError.empty
-                      ? 'Please enter your name'
-                      : null,
-              helperStyle: const TextStyle(color: Colors.redAccent),
-            ),
-            onChanged: (value) {
-              setState(() {
-                _name = NonEmptyInput.dirty(value: value);
-              });
-            },
-          ),
-          TextField(
-            decoration: InputDecoration(
-              labelText: 'Email',
-              helperText: _email.isPure
-                  ? null
-                  : _email.error == EmailValidationError.empty
-                      ? 'Please enter your email'
-                      : _email.error == EmailValidationError.invalid
-                          ? 'Invalid email'
+      child: Expanded(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  helperText: _name.isPure
+                      ? null
+                      : _name.error == NonEmptyValidationError.empty
+                          ? 'Please enter your name'
                           : null,
-              helperStyle: const TextStyle(color: Colors.redAccent),
-            ),
-            onChanged: (value) {
-              setState(() {
-                _email = EmailInput.dirty(value: value);
-              });
-            },
-          ),
-          TextField(
-            obscureText: _isPasswordObscure,
-            decoration: InputDecoration(
-              labelText: 'Password',
-              helperText: _password.isPure
-                  ? null
-                  : _password.error == PasswordValidationError.empty
-                      ? 'Please enter your password'
-                      : null,
-              helperStyle: const TextStyle(color: Colors.redAccent),
-              suffixIcon: IconButton(
-                icon: Icon(_isPasswordObscure
-                    ? Icons.visibility
-                    : Icons.visibility_off),
-                onPressed: () {
+                  helperStyle: const TextStyle(color: Colors.redAccent),
+                ),
+                onChanged: (value) {
                   setState(() {
-                    _isPasswordObscure = !_isPasswordObscure;
+                    _name = NonEmptyInput.dirty(value: value);
                   });
                 },
               ),
-            ),
-            onChanged: (value) {
-              setState(() {
-                _password = PasswordInput.dirty(value: value);
-              });
-            },
-          ),
-          TextField(
-            obscureText: _isConfirmObscure,
-            decoration: InputDecoration(
-              labelText: 'Confirm Password',
-              helperText: _confirm.isPure
-                  ? null
-                  : _confirm.error == ConfirmPasswordValidationError.empty
-                      ? 'Please enter your password again here'
-                      : _confirm.error ==
-                              ConfirmPasswordValidationError.noCoincidence
-                          ? 'Password not match'
-                          : null,
-              helperStyle: const TextStyle(color: Colors.redAccent),
-              suffixIcon: IconButton(
-                icon: Icon(_isConfirmObscure
-                    ? Icons.visibility
-                    : Icons.visibility_off),
-                onPressed: () {
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  helperText: _email.isPure
+                      ? null
+                      : _email.error == EmailValidationError.empty
+                          ? 'Please enter your email'
+                          : _email.error == EmailValidationError.invalid
+                              ? 'Invalid email'
+                              : null,
+                  helperStyle: const TextStyle(color: Colors.redAccent),
+                ),
+                onChanged: (value) {
                   setState(() {
-                    _isConfirmObscure = !_isConfirmObscure;
+                    _email = EmailInput.dirty(value: value);
                   });
                 },
               ),
-            ),
-            onChanged: (value) {
-              setState(() {
-                _confirm = ConfirmPasswordInput.dirty(
-                    password: _password.value, value: value);
-              });
-            },
+              TextField(
+                obscureText: _isPasswordObscure,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  helperText: _password.isPure
+                      ? null
+                      : _password.error == PasswordValidationError.empty
+                          ? 'Please enter your password'
+                          : null,
+                  helperStyle: const TextStyle(color: Colors.redAccent),
+                  suffixIcon: IconButton(
+                    icon: Icon(_isPasswordObscure
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordObscure = !_isPasswordObscure;
+                      });
+                    },
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _password = PasswordInput.dirty(value: value);
+                  });
+                },
+              ),
+              TextField(
+                obscureText: _isConfirmObscure,
+                decoration: InputDecoration(
+                  labelText: 'Confirm Password',
+                  helperText: _confirm.isPure
+                      ? null
+                      : _confirm.error == ConfirmPasswordValidationError.empty
+                          ? 'Please enter your password again here'
+                          : _confirm.error ==
+                                  ConfirmPasswordValidationError.noCoincidence
+                              ? 'Password not match'
+                              : null,
+                  helperStyle: const TextStyle(color: Colors.redAccent),
+                  suffixIcon: IconButton(
+                    icon: Icon(_isConfirmObscure
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _isConfirmObscure = !_isConfirmObscure;
+                      });
+                    },
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _confirm = ConfirmPasswordInput.dirty(
+                        password: _password.value, value: value);
+                  });
+                },
+              ),
+              const SizedBox(
+                height: 20.0,
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (_name.isValid &&
+                      _email.isValid &&
+                      _password.error != PasswordValidationError.empty &&
+                      _confirm.isValid) {
+                    BlocProvider.of<UserBloc>(context).add(
+                        Register(_name.value, _email.value, _password.value));
+                    // BlocProvider.of<UserBloc>(context)
+                    //     .add(Login(_email.value, _password.value));
+                  }
+                },
+                child: _inProgress
+                    ? const SizedBox(
+                        height: 16.0,
+                        width: 16.0,
+                        child: CircularProgressIndicator(),
+                      )
+                    : const Text('Submit'),
+              ),
+            ],
           ),
-          const SizedBox(
-            height: 20.0,
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (_name.isValid &&
-                  _email.isValid &&
-                  _password.error != PasswordValidationError.empty &&
-                  _confirm.isValid) {
-                BlocProvider.of<UserBloc>(context)
-                    .add(Register(_name.value, _email.value, _password.value));
-                // BlocProvider.of<UserBloc>(context)
-                //     .add(Login(_email.value, _password.value));
-              }
-            },
-            child: _inProgress
-                ? const SizedBox(
-                    height: 16.0,
-                    width: 16.0,
-                    child: CircularProgressIndicator(),
-                  )
-                : const Text('Submit'),
-          ),
-        ],
+        ),
       ),
     );
   }

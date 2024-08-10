@@ -5,7 +5,7 @@ import 'package:http/http.dart';
 import 'package:either_dart/either.dart';
 import 'package:llm_app/models.dart';
 
-const apiBase = 'localhost:8888';
+const apiBase = 'iguana-composed-redfish.ngrok-free.app';
 typedef JsonObject = Map<String, dynamic>;
 
 T? cast<T>(x) => x is T ? x : null;
@@ -16,7 +16,7 @@ Future<Either<ErrorResponse, Response>> generalRequest<T>(
   Object? body,
   Map<String, String>? headers,
 ) async {
-  var req = Request(method, Uri.http(apiBase, 'api/$endpoint'));
+  var req = Request(method, Uri.https(apiBase, 'api/$endpoint'));
   if (headers != null) {
     headers.forEach((k, v) => req.headers[k] = v);
   }
