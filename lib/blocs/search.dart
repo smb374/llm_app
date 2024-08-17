@@ -32,7 +32,9 @@ final class GetReport extends SearchEvent {
 
 final class SearchBloc extends Bloc<SearchEvent, GeneralState<SearchState>> {
   SearchBloc() : super(RequestInit()) {
-    on<FullSearch>((event, emit) => onEvent(event, emit, (event) async {
+    on<FullSearch>((event, emit) =>
+        onEvent<SearchState, FullSearch, SearchResponse>(event, emit,
+            (event) async {
           final queryTime = DateTime.now();
 
           final report =

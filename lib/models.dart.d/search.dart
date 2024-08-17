@@ -26,6 +26,51 @@ enum JType {
   C; // 刑事補償
 }
 
+// Request Params
+class SearchParams {
+  String? querySentence; // 全文檢索; TODO: distinguish with keyword
+  String? keyword; // 全文檢索
+  String? dateStart; // 日期;     date: <dateStart>~<dateEnd>
+  String? dateEnd; // 日期
+  List<String>? caseNum; // 年度字號
+  Set<CaseType>? caseTypes; // 類別
+  Set<String>? courts; // 法院
+  Set<JudgeLevel>? levels; // 審級
+  Set<JType>? jtypes; // 判决/裁定
+  String? issue; // 案由
+  String? main; // 主文
+
+  SearchParams({
+    this.querySentence,
+    this.keyword,
+    this.dateStart,
+    this.dateEnd,
+    this.caseNum,
+    this.caseTypes,
+    this.courts,
+    this.levels,
+    this.jtypes,
+    this.issue,
+    this.main,
+  });
+
+  Map<String, String> toMap() {
+    return {
+      'querySentence': querySentence ?? '',
+      'keyword': keyword ?? '',
+      'dateStart': dateStart ?? '',
+      'dateEnd': dateEnd ?? '',
+      'caseNum': (caseNum ?? []).join(','),
+      'caseTypes': (caseTypes ?? {}).map((v) => v.name).join(','),
+      'courts': (courts ?? {}).join(','),
+      'levels': (levels ?? {}).map((v) => v.name).join(','),
+      'jtypes': (jtypes ?? {}).map((v) => v.name).join(','),
+      'issue': issue ?? '',
+      'main': main ?? '',
+    };
+  }
+}
+
 // Jumbo response
 class SearchResponse with EquatableMixin {
   final SearchReportResponse reportResponse;
@@ -255,7 +300,7 @@ class SearchCaseCourt with EquatableMixin {
   final String? name;
   final int count;
   final String courtCode;
-  final String courtName;
+  final String? courtName;
 
   SearchCaseCourt(this.name, this.count, this.courtCode, this.courtName);
 

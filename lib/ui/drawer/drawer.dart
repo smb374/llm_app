@@ -42,6 +42,14 @@ class MainDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.search),
+            title: const Text('Search'),
+            onTap: () {
+              scaffold.openEndDrawer();
+              pageBloc.add(SwitchSearch());
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
             onTap: () {

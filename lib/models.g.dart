@@ -560,7 +560,7 @@ SearchCaseCourt _$SearchCaseCourtFromJson(Map<String, dynamic> json) =>
           $checkedConvert('name', (v) => v as String?),
           $checkedConvert('count', (v) => (v as num).toInt()),
           $checkedConvert('courtCode', (v) => v as String),
-          $checkedConvert('courtName', (v) => v as String),
+          $checkedConvert('courtName', (v) => v as String?),
         );
         return val;
       },

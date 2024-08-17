@@ -4,54 +4,10 @@ import 'package:http/http.dart';
 import 'package:either_dart/either.dart';
 import 'package:llm_app/models.dart';
 
-class SearchParams {
-  String? querySentence; // 全文檢索; TODO: distinguish with keyword
-  String? keyword; // 全文檢索
-  String? dateStart; // 日期;     date: <dateStart>~<dateEnd>
-  String? dateEnd; // 日期
-  List<String>? caseNum; // 年度字號
-  Set<CaseType>? caseTypes; // 類別
-  Set<String>? courts; // 法院
-  Set<JudgeLevel>? levels; // 審級
-  Set<JType>? jtypes; // 判决/裁定
-  String? issue; // 案由
-  String? main; // 主文
-
-  SearchParams({
-    this.querySentence,
-    this.keyword,
-    this.dateStart,
-    this.dateEnd,
-    this.caseNum,
-    this.caseTypes,
-    this.courts,
-    this.levels,
-    this.jtypes,
-    this.issue,
-    this.main,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'querySentence': querySentence ?? '',
-      'keyword': keyword ?? '',
-      'dateStart': dateStart ?? '',
-      'dateEnd': dateEnd ?? '',
-      'caseNum': (caseNum ?? []).join(','),
-      'caseTypes': (caseTypes ?? {}).map((v) => v.name).join(','),
-      'courts': (courts ?? {}).join(','),
-      'levels': (levels ?? {}).map((v) => v.name).join(','),
-      'jtypes': (jtypes ?? {}).map((v) => v.name).join(','),
-      'issue': issue ?? '',
-      'main': main ?? '',
-    };
-  }
-}
-
 Future<Either<ErrorResponse, T>> _searchBased<T>(
   String endpoint,
   SearchParams params,
-  Map<String, dynamic>? extraParams,
+  Map<String, String>? extraParams,
   DateTime queryTime,
   T Function(String) bodyParser,
 ) async {
@@ -59,7 +15,7 @@ Future<Either<ErrorResponse, T>> _searchBased<T>(
   if (extraParams != null) {
     paramMap.addAll(extraParams);
   }
-  paramMap['_'] = queryTime.millisecondsSinceEpoch;
+  paramMap['_'] = '${queryTime.millisecondsSinceEpoch}';
 
   final uri =
       Uri.https('www.lawplus.com.tw', 'rest/search/$endpoint', paramMap);
@@ -95,8 +51,8 @@ Future<Either<ErrorResponse, SearchReportResponse>> searchReport(
       'report',
       params,
       {
-        'rows': rows,
-        'page': page,
+        'rows': '$rows',
+        'page': '$page',
       },
       queryTime,
       (body) => SearchReportResponse.fromJson(jsonDecode(body)));

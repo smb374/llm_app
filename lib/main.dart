@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:llm_app/blocs/blocs.dart';
 import 'package:llm_app/blocs/page.dart';
+import 'package:llm_app/blocs/search.dart';
 import 'package:llm_app/models.dart';
 import 'package:llm_app/ui/login_page/login_page.dart';
 import 'package:llm_app/ui/drawer/drawer.dart';
+import 'package:llm_app/ui/search_page/search_page.dart';
 import 'package:llm_app/ui/session_page/session_page.dart';
 import 'package:llm_app/utils.dart';
 
@@ -24,6 +26,7 @@ class MyApp extends StatelessWidget {
           BlocProvider(create: (_) => SessionBloc()),
           BlocProvider(create: (_) => ChatBloc()),
           BlocProvider(create: (_) => PageBloc()),
+          BlocProvider(create: (_) => SearchBloc()),
         ],
         child: MaterialApp(
           title: 'LLM App Example',
@@ -168,6 +171,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 return SessionPage(
                   token: _token!,
                 );
+              case PageState.search:
+                return const SearchPage();
               default:
                 return const Placeholder();
             }
