@@ -32,7 +32,8 @@ Future<Either<ErrorResponse, T>> _searchBased<T>(
     return Left(ErrorResponse(error, false));
   }
 
-  final parseResult = Either.tryExcept(() => bodyParser(resp.body));
+  final parseResult =
+      Either.tryExcept(() => bodyParser(utf8.decode(resp.body.runes.toList())));
 
   if (parseResult.isLeft) {
     return Left(ErrorResponse('${parseResult.left}', false));
@@ -87,8 +88,8 @@ Future<Either<ErrorResponse, ReportResponse>> getReport(String id) async {
     return Left(ErrorResponse(error, false));
   }
 
-  final parseResult =
-      Either.tryExcept(() => ReportResponse.fromJson(jsonDecode(resp.body)));
+  final parseResult = Either.tryExcept(() => ReportResponse.fromJson(
+      jsonDecode(utf8.decode(resp.body.runes.toList()))));
 
   if (parseResult.isLeft) {
     return Left(ErrorResponse('${parseResult.left}', false));
