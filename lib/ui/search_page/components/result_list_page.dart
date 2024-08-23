@@ -44,7 +44,8 @@ class _ResultListPageState extends State<ResultListPage> {
             _resp = resp;
             _currPage = 1;
             _maxPage =
-                resp.reportResponse.total ~/ resp.reportResponse.rows.length;
+                resp.reportResponse.total ~/ resp.reportResponse.rows.length +
+                    1;
           });
         } else if (state is RequestSuccess<SearchState, SearchReportResponse>) {
           // Switch Page
@@ -65,7 +66,7 @@ class _ResultListPageState extends State<ResultListPage> {
           children: [
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(25.0),
+                padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                 child: _inProgress
                     ? const Center(
                         child: CircularProgressIndicator(),
@@ -78,17 +79,21 @@ class _ResultListPageState extends State<ResultListPage> {
                             children: _resp!.reportResponse.rows
                                 .map((v) => Card(
                                       child: ListTile(
-                                        title: Text('${v.caseNum} ${v.issue}'),
-                                        subtitle: Text(v.tags
-                                            .map((e) => e.substring(3))
-                                            .join(' | ')),
-                                      ),
+                                          title:
+                                              Text('${v.caseNum} ${v.issue}'),
+                                          subtitle: v.tags == null
+                                              ? const Text('No tags')
+                                              : Text(v.tags!
+                                                  .map((e) => e.substring(3))
+                                                  .join(' | '))),
                                     ))
                                 .toList(),
                           ),
               ),
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
                   child: TextButton.icon(
@@ -105,7 +110,26 @@ class _ResultListPageState extends State<ResultListPage> {
                   ),
                 ),
                 const SizedBox(width: 10.0),
-                Text('$_currPage/$_maxPage'),
+                // Text('$_currPage/$_maxPage'),
+                DropdownMenu(
+                  dropdownMenuEntries: List.generate(
+                      _maxPage,
+                      (i) =>
+                          DropdownMenuEntry(value: i + 1, label: '${i + 1}')),
+                  initialSelection: _currPage,
+                  menuHeight: 300.0,
+                  inputDecorationTheme: const InputDecorationTheme(
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 3.0),
+                  ),
+                  onSelected: (val) => val == null
+                      ? null
+                      : setState(() {
+                          searchBloc
+                              .add(SwitchSearchPage(widget.params, page: val));
+                          _currPage = val;
+                        }),
+                ),
                 const SizedBox(width: 10.0),
                 Expanded(
                   child: TextButton.icon(

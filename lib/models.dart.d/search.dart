@@ -148,11 +148,11 @@ class SearchReportRow with EquatableMixin {
   final String title;
   final String content;
   final String caseType;
-  final List<String> tags;
-  final String type;
+  final List<String>? tags;
+  final String? type;
   final List<String>? litigant;
   final String issue;
-  final String jtype;
+  final String? jtype;
   final String caseNum;
   final String identifier;
 
