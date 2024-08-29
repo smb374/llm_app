@@ -73,7 +73,7 @@ Future<Either<ErrorResponse, SearchCaseResponse>> searchCase(
 
 Future<Either<ErrorResponse, ReportResponse>> getReport(String id) async {
   final uri = Uri.https('www.lawplus.com.tw', 'rest/search/report/$id',
-      {'_': DateTime.now().millisecondsSinceEpoch});
+      {'_': '${DateTime.now().millisecondsSinceEpoch}'});
 
   final req = Request('GET', uri);
   final result = Either.tryExcept(() => req.send());

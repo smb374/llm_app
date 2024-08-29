@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:llm_app/blocs/blocs.dart';
-import 'package:llm_app/blocs/search.dart';
 import 'package:llm_app/models.dart';
+import 'package:llm_app/ui/report_page/report_page.dart';
 import 'package:llm_app/utils.dart';
 
 class ResultListPage extends StatefulWidget {
@@ -22,9 +22,18 @@ class _ResultListPageState extends State<ResultListPage> {
   @override
   Widget build(BuildContext context) {
     final searchBloc = BlocProvider.of<SearchBloc>(context);
+    if (_resp != null) {
+      setState(() {
+        _inProgress = false;
+      });
+    }
     return BlocListener<SearchBloc, GeneralState<SearchState>>(
       listener: (context, state) {
-        if (state is RequestInProgress) {
+        if (state is RequestInProgress<SearchState, FullSearch>) {
+          setState(() {
+            _inProgress = true;
+          });
+        } else if (state is RequestInProgress<SearchState, SwitchSearchPage>) {
           setState(() {
             _inProgress = true;
           });
@@ -79,13 +88,22 @@ class _ResultListPageState extends State<ResultListPage> {
                             children: _resp!.reportResponse.rows
                                 .map((v) => Card(
                                       child: ListTile(
-                                          title:
-                                              Text('${v.caseNum} ${v.issue}'),
-                                          subtitle: v.tags == null
-                                              ? const Text('No tags')
-                                              : Text(v.tags!
-                                                  .map((e) => e.substring(3))
-                                                  .join(' | '))),
+                                        title: Text('${v.caseNum} ${v.issue}'),
+                                        subtitle: v.tags == null
+                                            ? const Text('No tags')
+                                            : Text(v.tags!
+                                                .map((e) => e.substring(3))
+                                                .join(' | ')),
+                                        onTap: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => ReportPage(
+                                                caseNum: v.caseNum,
+                                                issue: v.issue,
+                                                reportId: v.identifier),
+                                          ),
+                                        ),
+                                      ),
                                     ))
                                 .toList(),
                           ),
@@ -110,7 +128,6 @@ class _ResultListPageState extends State<ResultListPage> {
                   ),
                 ),
                 const SizedBox(width: 10.0),
-                // Text('$_currPage/$_maxPage'),
                 DropdownMenu(
                   dropdownMenuEntries: List.generate(
                       _maxPage,
