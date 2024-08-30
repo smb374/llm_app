@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:llm_app/blocs/search.dart';
 import 'package:llm_app/models.dart';
 import 'package:llm_app/ui/search_page/components/result_list_page.dart';
+import 'package:multi_dropdown/multi_dropdown.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -26,6 +27,8 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     final searchBloc = BlocProvider.of<SearchBloc>(context);
+    final tagsController = MultiSelectController<ReportTag>();
+    final theme = Theme.of(context);
 
     return Padding(
       padding: const EdgeInsets.only(left: 50.0, right: 50.0),
@@ -131,7 +134,51 @@ class _SearchPageState extends State<SearchPage> {
               border: OutlineInputBorder(),
             ),
           ),
+          MultiDropdown<ReportTag>(
+            controller: tagsController,
+            fieldDecoration: const FieldDecoration(
+              hintText: '分類',
+              borderRadius: 5,
+            ),
+            dropdownDecoration: DropdownDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+              backgroundColor: theme.colorScheme.surfaceContainer,
+              maxHeight: 200,
+            ),
+            dropdownItemDecoration: DropdownItemDecoration(
+              selectedBackgroundColor: theme.colorScheme.secondaryFixed,
+              disabledBackgroundColor: theme.colorScheme.surfaceDim,
+            ),
+            items: [
+              DropdownItem(label: ReportTag.tagEC.name, value: ReportTag.tagEC),
+              DropdownItem(label: ReportTag.tagHI.name, value: ReportTag.tagHI),
+              DropdownItem(label: ReportTag.tagLP.name, value: ReportTag.tagLP),
+              DropdownItem(label: ReportTag.tagIP.name, value: ReportTag.tagIP),
+              DropdownItem(label: ReportTag.tagCI.name, value: ReportTag.tagCI),
+              DropdownItem(label: ReportTag.tagBD.name, value: ReportTag.tagBD),
+              DropdownItem(label: ReportTag.tagMD.name, value: ReportTag.tagMD),
+              DropdownItem(label: ReportTag.tagCD.name, value: ReportTag.tagCD),
+              DropdownItem(label: ReportTag.tagNC.name, value: ReportTag.tagNC),
+              DropdownItem(label: ReportTag.tagIW.name, value: ReportTag.tagIW),
+              DropdownItem(label: ReportTag.tagID.name, value: ReportTag.tagID),
+              DropdownItem(label: ReportTag.tagTP.name, value: ReportTag.tagTP),
+              DropdownItem(label: ReportTag.tagEP.name, value: ReportTag.tagEP),
+              DropdownItem(label: ReportTag.tagRD.name, value: ReportTag.tagRD),
+              DropdownItem(label: ReportTag.tagEA.name, value: ReportTag.tagEA),
+              DropdownItem(label: ReportTag.tagPC.name, value: ReportTag.tagPC),
+              DropdownItem(label: ReportTag.tagBC.name, value: ReportTag.tagBC),
+              DropdownItem(label: ReportTag.tagFM.name, value: ReportTag.tagFM),
+              DropdownItem(label: ReportTag.tagGP.name, value: ReportTag.tagGP),
+              DropdownItem(label: ReportTag.tagSA.name, value: ReportTag.tagSA),
+              DropdownItem(label: ReportTag.tagFT.name, value: ReportTag.tagFT),
+              DropdownItem(label: ReportTag.tagPE.name, value: ReportTag.tagPE),
+              DropdownItem(label: ReportTag.tagLA.name, value: ReportTag.tagLA),
+              DropdownItem(label: ReportTag.tagPN.name, value: ReportTag.tagPN),
+              DropdownItem(label: ReportTag.tagFC.name, value: ReportTag.tagFC),
+            ],
+          ),
           ElevatedButton(
+            child: const Text('Submit'),
             onPressed: () {
               final cn = [_caseNum1, _caseNum2, _caseNum3]
                   .map((x) => x.text)
@@ -150,6 +197,7 @@ class _SearchPageState extends State<SearchPage> {
                 caseNum: cn.isNotEmpty ? cn : null,
                 issue: _issue.text != '' ? _issue.text : null,
                 main: _main.text != '' ? _main.text : null,
+                tags: tagsController.selectedItems.map((v) => v.value).toSet(),
               );
               searchBloc.add(FullSearch(params));
               Navigator.push(
@@ -159,7 +207,6 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               );
             },
-            child: const Text('Submit'),
           ),
         ].expand((x) => [const SizedBox(height: 10.0), x]).skip(1).toList(),
       ),

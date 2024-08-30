@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 part of '../models.dart';
 
 // Search
@@ -26,6 +28,93 @@ enum JType {
   C; // 刑事補償
 }
 
+enum ReportTag {
+  tagEC('感情事件'),
+  tagHI('遺產繼承'),
+  tagLP('勞資糾紛'),
+  tagIP('智慧財產'),
+  tagCI('公司經營'),
+  tagBD('銀行債務'),
+  tagMD('醫療糾紛'),
+  tagCD('車禍糾紛'),
+  tagNC('國家賠償'),
+  tagIW('網路世界'),
+  tagID('保險爭議'),
+  tagTP('消費爭議'),
+  tagEP('毒品問題'),
+  tagRD('營造工程'),
+  tagEA('選舉訴訟'),
+  tagPC('支付命令'),
+  tagBC('兒少事件'),
+  tagFM('金融市場'),
+  tagGP('政府採購'),
+  tagSA('性侵案件'),
+  tagFT('公平交易'),
+  tagPE('環境保護'),
+  tagLA('訴訟程序'),
+  tagPN('房地糾紛'),
+  tagFC('詐騙案件');
+
+  final String name;
+
+  const ReportTag(this.name);
+
+  String toCode() {
+    switch (this) {
+      case ReportTag.tagEC:
+        return 'EC';
+      case ReportTag.tagHI:
+        return 'HI';
+      case ReportTag.tagLP:
+        return 'LP';
+      case ReportTag.tagIP:
+        return 'IP';
+      case ReportTag.tagCI:
+        return 'CI';
+      case ReportTag.tagBD:
+        return 'BD';
+      case ReportTag.tagMD:
+        return 'MD';
+      case ReportTag.tagCD:
+        return 'CD';
+      case ReportTag.tagNC:
+        return 'NC';
+      case ReportTag.tagIW:
+        return 'IW';
+      case ReportTag.tagID:
+        return 'ID';
+      case ReportTag.tagTP:
+        return 'TP';
+      case ReportTag.tagEP:
+        return 'EP';
+      case ReportTag.tagRD:
+        return 'RD';
+      case ReportTag.tagEA:
+        return 'EA';
+      case ReportTag.tagPC:
+        return 'PC';
+      case ReportTag.tagBC:
+        return 'BC';
+      case ReportTag.tagFM:
+        return 'FM';
+      case ReportTag.tagGP:
+        return 'GP';
+      case ReportTag.tagSA:
+        return 'SA';
+      case ReportTag.tagFT:
+        return 'FT';
+      case ReportTag.tagPE:
+        return 'PE';
+      case ReportTag.tagLA:
+        return 'LA';
+      case ReportTag.tagPN:
+        return 'PN';
+      case ReportTag.tagFC:
+        return 'FC';
+    }
+  }
+}
+
 // Request Params
 class SearchParams {
   String? querySentence; // 全文檢索; TODO: distinguish with keyword
@@ -37,6 +126,7 @@ class SearchParams {
   Set<String>? courts; // 法院
   Set<JudgeLevel>? levels; // 審級
   Set<JType>? jtypes; // 判决/裁定
+  Set<ReportTag>? tags; // 分類
   String? issue; // 案由
   String? main; // 主文
 
@@ -50,6 +140,7 @@ class SearchParams {
     this.courts,
     this.levels,
     this.jtypes,
+    this.tags,
     this.issue,
     this.main,
   });
@@ -65,6 +156,7 @@ class SearchParams {
       'courts': (courts ?? {}).join(','),
       'levels': (levels ?? {}).map((v) => v.name).join(','),
       'jtypes': (jtypes ?? {}).map((v) => v.name).join(','),
+      'tags': (tags ?? {}).map((v) => v.toCode()).join(','),
       'issue': issue ?? '',
       'main': main ?? '',
     };
