@@ -21,13 +21,14 @@ class _SearchPageState extends State<SearchPage> {
   final TextEditingController _caseNum3 = TextEditingController();
   final TextEditingController _issue = TextEditingController();
   final TextEditingController _main = TextEditingController();
+  final MultiSelectController<ReportTag> _tagsController =
+      MultiSelectController();
 
   _SearchPageState();
 
   @override
   Widget build(BuildContext context) {
     final searchBloc = BlocProvider.of<SearchBloc>(context);
-    final tagsController = MultiSelectController<ReportTag>();
     final theme = Theme.of(context);
 
     return Padding(
@@ -41,6 +42,7 @@ class _SearchPageState extends State<SearchPage> {
             decoration: const InputDecoration(
               labelText: '全文檢索',
               border: OutlineInputBorder(),
+              isDense: true,
             ),
           ),
           Row(
@@ -58,6 +60,12 @@ class _SearchPageState extends State<SearchPage> {
                       }
                     });
                   },
+                  style: ButtonStyle(
+                    shape: WidgetStateProperty.all<OutlinedBorder?>(
+                        const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5)))),
+                  ),
                   child: Text(_dateStart == null
                       ? '開始日期'
                       : '${_dateStart!.year}-${_dateStart!.month}-${_dateStart!.day}'),
@@ -77,6 +85,12 @@ class _SearchPageState extends State<SearchPage> {
                       }
                     });
                   },
+                  style: ButtonStyle(
+                    shape: WidgetStateProperty.all<OutlinedBorder?>(
+                        const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5)))),
+                  ),
                   child: Text(_dateEnd == null
                       ? '結束日期'
                       : '${_dateEnd!.year}-${_dateEnd!.month}-${_dateEnd!.day}'),
@@ -93,6 +107,7 @@ class _SearchPageState extends State<SearchPage> {
                   decoration: const InputDecoration(
                     labelText: '年',
                     border: OutlineInputBorder(),
+                    isDense: true,
                   ),
                 ),
               ),
@@ -104,6 +119,7 @@ class _SearchPageState extends State<SearchPage> {
                   decoration: const InputDecoration(
                     labelText: '字',
                     border: OutlineInputBorder(),
+                    isDense: true,
                   ),
                 ),
               ),
@@ -115,6 +131,7 @@ class _SearchPageState extends State<SearchPage> {
                   decoration: const InputDecoration(
                     labelText: '號',
                     border: OutlineInputBorder(),
+                    isDense: true,
                   ),
                 ),
               ),
@@ -125,6 +142,7 @@ class _SearchPageState extends State<SearchPage> {
             decoration: const InputDecoration(
               labelText: '案由',
               border: OutlineInputBorder(),
+              isDense: true,
             ),
           ),
           TextField(
@@ -132,10 +150,11 @@ class _SearchPageState extends State<SearchPage> {
             decoration: const InputDecoration(
               labelText: '主文',
               border: OutlineInputBorder(),
+              isDense: true,
             ),
           ),
           MultiDropdown<ReportTag>(
-            controller: tagsController,
+            controller: _tagsController,
             fieldDecoration: const FieldDecoration(
               hintText: '分類',
               borderRadius: 5,
@@ -197,7 +216,7 @@ class _SearchPageState extends State<SearchPage> {
                 caseNum: cn.isNotEmpty ? cn : null,
                 issue: _issue.text != '' ? _issue.text : null,
                 main: _main.text != '' ? _main.text : null,
-                tags: tagsController.selectedItems.map((v) => v.value).toSet(),
+                tags: _tagsController.selectedItems.map((v) => v.value).toSet(),
               );
               searchBloc.add(FullSearch(params));
               Navigator.push(
