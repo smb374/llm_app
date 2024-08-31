@@ -52,8 +52,9 @@ class _ResultListPageState extends State<ResultListPage> {
             _inProgress = false;
             _resp = resp;
             _currPage = 1;
-            _maxPage =
-                resp.reportResponse.total ~/ resp.reportResponse.rows.length +
+            _maxPage = resp.reportResponse.rows.isEmpty
+                ? 0
+                : resp.reportResponse.total ~/ resp.reportResponse.rows.length +
                     1;
           });
         } else if (state is RequestSuccess<SearchState, SearchReportResponse>) {
