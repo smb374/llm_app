@@ -429,8 +429,8 @@ class ReportResponse {
 class ReportResponseData {
   final ReportBase reportBase;
   final ReportDetail report;
-  final List<ReportStatute> statute;
-  final List<String> tags;
+  final List<ReportStatute>? statute;
+  final List<String>? tags;
 
   ReportResponseData(
     this.reportBase,
@@ -495,7 +495,7 @@ class ReportDetail {
   final int? proportion;
   final int? amount;
   final bool flag;
-  final String jtype;
+  final String? jtype;
   final String? previousCaseNum;
   final int? previousJudgeDate;
   final String? previousCourtCode;
@@ -583,7 +583,7 @@ class ReportBase {
   final int reportStatus;
   final dynamic gist;
   final dynamic summary;
-  final String jtype;
+  final String? jtype;
   final dynamic fulltext;
   final int lastUpdate;
   final String source;

@@ -608,11 +608,12 @@ ReportResponseData _$ReportResponseDataFromJson(Map<String, dynamic> json) =>
               (v) => ReportDetail.fromJson(v as Map<String, dynamic>)),
           $checkedConvert(
               'statute',
-              (v) => (v as List<dynamic>)
-                  .map((e) => ReportStatute.fromJson(e as Map<String, dynamic>))
+              (v) => (v as List<dynamic>?)
+                  ?.map(
+                      (e) => ReportStatute.fromJson(e as Map<String, dynamic>))
                   .toList()),
           $checkedConvert('tags',
-              (v) => (v as List<dynamic>).map((e) => e as String).toList()),
+              (v) => (v as List<dynamic>?)?.map((e) => e as String).toList()),
         );
         return val;
       },
@@ -685,7 +686,7 @@ ReportDetail _$ReportDetailFromJson(Map<String, dynamic> json) =>
           $checkedConvert('proportion', (v) => (v as num?)?.toInt()),
           $checkedConvert('amount', (v) => (v as num?)?.toInt()),
           $checkedConvert('flag', (v) => v as bool),
-          $checkedConvert('jtype', (v) => v as String),
+          $checkedConvert('jtype', (v) => v as String?),
           $checkedConvert('previousCaseNum', (v) => v as String?),
           $checkedConvert('previousJudgeDate', (v) => (v as num?)?.toInt()),
           $checkedConvert('previousCourtCode', (v) => v as String?),
@@ -777,7 +778,7 @@ ReportBase _$ReportBaseFromJson(Map<String, dynamic> json) => $checkedCreate(
           $checkedConvert('reportStatus', (v) => (v as num).toInt()),
           $checkedConvert('gist', (v) => v),
           $checkedConvert('summary', (v) => v),
-          $checkedConvert('jtype', (v) => v as String),
+          $checkedConvert('jtype', (v) => v as String?),
           $checkedConvert('fulltext', (v) => v),
           $checkedConvert('lastUpdate', (v) => (v as num).toInt()),
           $checkedConvert('source', (v) => v as String),

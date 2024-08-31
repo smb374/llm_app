@@ -57,6 +57,9 @@ class _ResultListPageState extends State<ResultListPage> {
                 : resp.reportResponse.total ~/ resp.reportResponse.rows.length +
                     1;
           });
+          if (_maxPage == 0) {
+            Navigator.pop(context, 0xdeadbeef);
+          }
         } else if (state is RequestSuccess<SearchState, SearchReportResponse>) {
           // Switch Page
           setState(() {

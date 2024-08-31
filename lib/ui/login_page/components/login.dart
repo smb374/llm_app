@@ -51,6 +51,7 @@ class _LoginContentState extends State<LoginContent> {
                           ? 'Invalid email'
                           : null,
               helperStyle: const TextStyle(color: Colors.redAccent),
+              isDense: true,
             ),
             onChanged: (value) {
               setState(() {
@@ -77,6 +78,7 @@ class _LoginContentState extends State<LoginContent> {
                   });
                 },
               ),
+              isDense: true,
             ),
             onChanged: (value) {
               setState(() {
