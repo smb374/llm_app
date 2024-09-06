@@ -24,11 +24,6 @@ class _ResultListPageState extends State<ResultListPage> {
   @override
   Widget build(BuildContext context) {
     final searchBloc = BlocProvider.of<SearchBloc>(context);
-    if (_page != null) {
-      setState(() {
-        _inProgress = false;
-      });
-    }
     return BlocListener<SearchBloc, GeneralState<SearchState>>(
       listener: (context, state) {
         if (state is RequestInProgress<SearchState, FullSearch>) {
@@ -109,7 +104,8 @@ class _ResultListPageState extends State<ResultListPage> {
                                                 issue: v.issue,
                                                 reportId: v.identifier),
                                           ),
-                                        ),
+                                        ).then((v) => setState(
+                                            () => _inProgress = false)),
                                       ),
                                     ))
                                 .toList(),
