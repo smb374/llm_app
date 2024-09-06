@@ -15,14 +15,16 @@ class ResultListPage extends StatefulWidget {
 
 class _ResultListPageState extends State<ResultListPage> {
   bool _inProgress = true;
-  SearchResponse? _resp;
+  SearchReportResponse? _page;
+  // SearchLevelResponse? _level;
+  // SearchCaseResponse? _case;
   int _currPage = 0;
   int _maxPage = 0;
 
   @override
   Widget build(BuildContext context) {
     final searchBloc = BlocProvider.of<SearchBloc>(context);
-    if (_resp != null) {
+    if (_page != null) {
       setState(() {
         _inProgress = false;
       });
@@ -48,24 +50,25 @@ class _ResultListPageState extends State<ResultListPage> {
           generalAlert(context, 'Get Report Failed', state.error);
         } else if (state is RequestSuccess<SearchState, SearchResponse>) {
           final resp = state.resp;
+          if (resp.reportResponse.total == 0) {
+            Navigator.pop(context, 0xdeadbeef);
+          }
           setState(() {
             _inProgress = false;
-            _resp = resp;
+            _page = resp.reportResponse;
+            // _level = resp.levelResponse;
+            // _case = resp.caseResponse;
             _currPage = 1;
             _maxPage = resp.reportResponse.rows.isEmpty
                 ? 0
                 : resp.reportResponse.total ~/ resp.reportResponse.rows.length +
                     1;
           });
-          if (_maxPage == 0) {
-            Navigator.pop(context, 0xdeadbeef);
-          }
         } else if (state is RequestSuccess<SearchState, SearchReportResponse>) {
           // Switch Page
           setState(() {
             _inProgress = false;
-            _resp = SearchResponse(
-                state.resp, _resp!.levelResponse, _resp!.caseResponse);
+            _page = state.resp;
           });
         }
       },
@@ -84,12 +87,12 @@ class _ResultListPageState extends State<ResultListPage> {
                     ? const Center(
                         child: CircularProgressIndicator(),
                       )
-                    : _resp == null
+                    : _page == null
                         ? const Center(
                             child: Text('No result'),
                           )
                         : ListView(
-                            children: _resp!.reportResponse.rows
+                            children: _page!.rows
                                 .map((v) => Card(
                                       child: ListTile(
                                         title: Text('${v.caseNum} ${v.issue}'),
@@ -132,25 +135,7 @@ class _ResultListPageState extends State<ResultListPage> {
                   ),
                 ),
                 const SizedBox(width: 10.0),
-                DropdownMenu(
-                  dropdownMenuEntries: List.generate(
-                      _maxPage,
-                      (i) =>
-                          DropdownMenuEntry(value: i + 1, label: '${i + 1}')),
-                  initialSelection: _currPage,
-                  menuHeight: 300.0,
-                  inputDecorationTheme: const InputDecorationTheme(
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 3.0),
-                  ),
-                  onSelected: (val) => val == null
-                      ? null
-                      : setState(() {
-                          searchBloc
-                              .add(SwitchSearchPage(widget.params, page: val));
-                          _currPage = val;
-                        }),
-                ),
+                Text('$_currPage/$_maxPage'),
                 const SizedBox(width: 10.0),
                 Expanded(
                   child: TextButton.icon(

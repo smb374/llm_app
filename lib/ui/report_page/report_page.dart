@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:llm_app/blocs/blocs.dart';
 import 'package:llm_app/models.dart';
 import 'package:llm_app/utils.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:llm_app/ui/webview_page/webview_page.dart';
 
 class ReportPage extends StatefulWidget {
   final String caseNum;
@@ -35,7 +37,23 @@ class _ReportPageState extends State<ReportPage> {
             child = Padding(
               padding: const EdgeInsets.all(20.0),
               child: SingleChildScrollView(
-                child: Text(resp.response.reportBase.content),
+                child: Html(
+                  data: '<div>${resp.response.reportBase.content}</div>',
+                  onLinkTap: (url, attributes, element) {
+                    if (url != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => WebViewPage(url: url)),
+                      );
+                    }
+                  },
+                  style: {
+                    'div': Style(
+                      whiteSpace: WhiteSpace.pre,
+                    ),
+                  },
+                ),
               ),
             );
           }
