@@ -1,3 +1,5 @@
+import 'package:llm_app/models.dart';
+
 import 'shared.dart';
 import '../api/user.dart';
 import 'package:bloc/bloc.dart';
@@ -59,6 +61,19 @@ final class UserRewind extends UserEvent {
 
 final class UserReset extends UserEvent {}
 
+final class UserOauthSuccess extends UserEvent {
+  final String token;
+  final String refreshToken;
+
+  UserOauthSuccess(this.token, this.refreshToken);
+}
+
+final class UserOauthFailed extends UserEvent {
+  final String error;
+
+  UserOauthFailed(this.error);
+}
+
 final class UserBloc extends Bloc<UserEvent, GeneralState<UserState>> {
   String? _newToken;
 
@@ -89,6 +104,11 @@ final class UserBloc extends Bloc<UserEvent, GeneralState<UserState>> {
       _newToken = null;
       await onEvent(event, emit, (event) => profile(token));
     });
+
+    on<UserOauthSuccess>((event, emit) => emit(
+        RequestSuccess(UserLoginResponse(event.token, event.refreshToken))));
+
+    on<UserOauthFailed>((event, emit) => emit(RequestFailed(event.error)));
 
     on<Logout>((_, emit) => emit(UserLogout()));
     on<UserReset>((_, emit) => emit(RequestInit()));

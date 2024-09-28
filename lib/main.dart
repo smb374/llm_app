@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:llm_app/blocs/blocs.dart';
@@ -14,12 +17,44 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
+  State<StatefulWidget> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _appLinks = AppLinks();
+  StreamSubscription? _sub;
+  _MyAppState();
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    _sub = _appLinks.uriLinkStream.listen((uri) {
+      if (uri.path.contains('auth/callback')) {
+        final error = uri.queryParameters['error'];
+        if (error != null) {
+          if (context.mounted) {
+            BlocProvider.of<UserBloc>(context).add(UserOauthFailed(error));
+          }
+        } else {
+          final token = uri.queryParameters['token']!;
+          final refreshToken = uri.queryParameters['refreshToken']!;
+          if (context.mounted) {
+            BlocProvider.of<UserBloc>(context)
+                .add(UserOauthSuccess(token, refreshToken));
+          }
+        }
+      }
+    });
     return MultiBlocProvider(
         providers: [
           BlocProvider(create: (_) => UserBloc()),
