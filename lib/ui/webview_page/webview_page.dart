@@ -13,13 +13,27 @@ class _WebViewPageState extends State<WebViewPage> {
   int loadingPercentage = 0;
   late final WebViewController controller;
   FutureBuilder<String?>? pageTitle;
+  Uri? _authCallback;
 
   @override
   void initState() {
     super.initState();
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setUserAgent(
+          'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.6668.81 Mobile Safari/537.36')
       ..setNavigationDelegate(NavigationDelegate(
+        onNavigationRequest: (req) async {
+          final uri = Uri.parse(req.url);
+          if (uri.scheme == 'myapp') {
+            setState(() {
+              _authCallback = uri;
+            });
+            return NavigationDecision.prevent;
+          } else {
+            return NavigationDecision.navigate;
+          }
+        },
         onPageStarted: (url) {
           setState(() {
             loadingPercentage = 0;
@@ -53,6 +67,11 @@ class _WebViewPageState extends State<WebViewPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_authCallback != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pop(context, _authCallback!);
+      });
+    }
     return Scaffold(
       appBar: AppBar(
         title: pageTitle,

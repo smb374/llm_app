@@ -52,14 +52,5 @@
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>This app needs access to the local network for development purposes.</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-			<string>myapp</string>
-			</array>
-		</dict>
-	</array>
 </dict>
 </plist>
