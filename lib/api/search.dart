@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:either_dart/either.dart';
 import 'package:llm_app/models.dart';
+import 'package:llm_app/utils.dart';
 
 Future<Either<ErrorResponse, T>> _searchBased<T>(
   String endpoint,
@@ -17,8 +18,7 @@ Future<Either<ErrorResponse, T>> _searchBased<T>(
   }
   paramMap['_'] = '${queryTime.millisecondsSinceEpoch}';
 
-  final uri =
-      Uri.https('www.lawplus.com.tw', 'rest/search/$endpoint', paramMap);
+  final uri = Uri.https(apiBase, 'api/search/$endpoint', paramMap);
   final req = Request('GET', uri);
   final result = Either.tryExcept(() => req.send());
   if (result.isLeft) {
@@ -32,8 +32,7 @@ Future<Either<ErrorResponse, T>> _searchBased<T>(
     return Left(ErrorResponse(error, false));
   }
 
-  final parseResult =
-      Either.tryExcept(() => bodyParser(utf8.decode(resp.body.runes.toList())));
+  final parseResult = Either.tryExcept(() => bodyParser(resp.body));
 
   if (parseResult.isLeft) {
     return Left(ErrorResponse('${parseResult.left}', false));
@@ -67,12 +66,12 @@ Future<Either<ErrorResponse, SearchLevelResponse>> searchLevel(
 
 Future<Either<ErrorResponse, SearchCaseResponse>> searchCase(
     SearchParams params, DateTime queryTime) async {
-  return _searchBased('caseTypeAndCourtAndJtype', params, null, queryTime,
+  return _searchBased('case', params, null, queryTime,
       (body) => SearchCaseResponse.fromJson(jsonDecode(body)));
 }
 
 Future<Either<ErrorResponse, ReportResponse>> getReport(String id) async {
-  final uri = Uri.https('www.lawplus.com.tw', 'rest/search/report/$id',
+  final uri = Uri.https(apiBase, 'api/search/report/$id',
       {'_': '${DateTime.now().millisecondsSinceEpoch}'});
 
   final req = Request('GET', uri);
@@ -88,8 +87,8 @@ Future<Either<ErrorResponse, ReportResponse>> getReport(String id) async {
     return Left(ErrorResponse(error, false));
   }
 
-  final parseResult = Either.tryExcept(() => ReportResponse.fromJson(
-      jsonDecode(utf8.decode(resp.body.runes.toList()))));
+  final parseResult =
+      Either.tryExcept(() => ReportResponse.fromJson(jsonDecode(resp.body)));
 
   if (parseResult.isLeft) {
     return Left(ErrorResponse('${parseResult.left}', false));

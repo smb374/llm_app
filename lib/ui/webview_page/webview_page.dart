@@ -62,6 +62,9 @@ class _WebViewPageState extends State<WebViewPage> {
       ))
       ..loadRequest(
         Uri.parse(widget.url),
+        headers: {
+          'ngrok-skip-browser-warning': '1',
+        },
       );
   }
 
