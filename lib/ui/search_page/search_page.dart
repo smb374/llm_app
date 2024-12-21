@@ -7,7 +7,8 @@ import 'package:llm_app/utils.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({super.key});
+  final String? token;
+  const SearchPage({this.token, super.key});
 
   @override
   State<StatefulWidget> createState() => _SearchPageState();
@@ -208,12 +209,15 @@ class _SearchPageState extends State<SearchPage> {
                   Navigator.push<int?>(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ResultListPage(params: params),
+                      builder: (context) =>
+                          ResultListPage(token: widget.token, params: params),
                     ),
                   ).then((result) {
                     if (result == 0xdeadbeef) {
-                      generalAlert(context, 'No Reports Found',
-                          'Your query condition did not match any results.');
+                      if (context.mounted) {
+                        generalAlert(context, 'No Reports Found',
+                            'Your query condition did not match any results.');
+                      }
                     }
                   });
                 },

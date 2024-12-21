@@ -29,6 +29,19 @@ Future<Either<ErrorResponse, SessionCreateResponse>> sessionCreate(
   );
 }
 
+Future<Either<ErrorResponse, SessionCreateResponse>> sessionCreateWithReport(
+  String token,
+  String reportId,
+) async {
+  return genericRequest(
+    'POST',
+    'session/create/with-report/$reportId',
+    null,
+    {'Authorization': 'Bearer $token'},
+    (body) => SessionCreateResponse.fromJson(jsonDecode(body)),
+  );
+}
+
 Future<Either<ErrorResponse, SessionDeleteResponse>> sessionDelete(
   String token,
   String sessionId,

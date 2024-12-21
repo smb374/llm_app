@@ -177,7 +177,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   token: _token!,
                 );
               case PageState.search:
-                return const SearchPage();
+                return SearchPage(token: _token);
               default:
                 return const Placeholder();
             }

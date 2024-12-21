@@ -10,10 +10,12 @@ class ReportPage extends StatefulWidget {
   final String caseNum;
   final String issue;
   final String reportId;
+  final String? token;
   const ReportPage(
       {required this.caseNum,
       required this.issue,
       required this.reportId,
+      this.token,
       super.key});
 
   @override
@@ -27,6 +29,7 @@ class _ReportPageState extends State<ReportPage> {
     return BlocBuilder<SearchBloc, GeneralState<SearchState>>(
       builder: (context, state) {
         Widget child = const Text('Unknown State.');
+        Widget actionButton = Container();
         if (state is RequestInProgress) {
           child = const CircularProgressIndicator();
         } else if (state is RequestSuccess<SearchState, ReportResponse>) {
@@ -56,6 +59,16 @@ class _ReportPageState extends State<ReportPage> {
                 ),
               ),
             );
+            if (widget.token != null) {
+              actionButton = FloatingActionButton(
+                  tooltip: 'Create session with this report',
+                  child: const Icon(Icons.add),
+                  onPressed: () {
+                    BlocProvider.of<SessionBloc>(context).add(
+                        SessionCreateWithReport(widget.token!,
+                            resp.response.reportBase.identifier));
+                  });
+            }
           }
         } else if (state is RequestFailed<SearchState, GetReport>) {
           generalAlert(context, 'Get Report Request Failed', state.error);
@@ -65,6 +78,7 @@ class _ReportPageState extends State<ReportPage> {
           appBar: AppBar(
             title: Text('${widget.caseNum} ${widget.issue}'),
           ),
+          floatingActionButton: actionButton,
           body: Center(
             child: child,
           ),

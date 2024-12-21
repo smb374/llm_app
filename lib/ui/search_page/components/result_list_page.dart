@@ -7,7 +7,8 @@ import 'package:llm_app/utils.dart';
 
 class ResultListPage extends StatefulWidget {
   final SearchParams params;
-  const ResultListPage({required this.params, super.key});
+  final String? token;
+  const ResultListPage({this.token, required this.params, super.key});
 
   @override
   State<StatefulWidget> createState() => _ResultListPageState();
@@ -100,6 +101,7 @@ class _ResultListPageState extends State<ResultListPage> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (_) => ReportPage(
+                                                token: widget.token,
                                                 caseNum: v.caseNum,
                                                 issue: v.issue,
                                                 reportId: v.identifier),

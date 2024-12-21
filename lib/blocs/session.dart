@@ -55,6 +55,13 @@ final class SessionRewind extends SessionEvent {
 
 final class SessionReset extends SessionEvent {}
 
+final class SessionCreateWithReport extends SessionEvent {
+  final String token;
+  final String id;
+
+  SessionCreateWithReport(this.token, this.id);
+}
+
 final class SessionBloc extends Bloc<SessionEvent, GeneralState<SessionState>> {
   String? _newToken;
 
@@ -63,6 +70,13 @@ final class SessionBloc extends Bloc<SessionEvent, GeneralState<SessionState>> {
       final token = _newToken ?? event.token;
       _newToken = null;
       await onEvent(event, emit, (event) => sessionCreate(token));
+    });
+
+    on<SessionCreateWithReport>((event, emit) async {
+      final token = _newToken ?? event.token;
+      _newToken = null;
+      await onEvent(
+          event, emit, (event) => sessionCreateWithReport(token, event.id));
     });
 
     on<SessionDelete>((event, emit) async {
