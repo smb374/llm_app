@@ -61,10 +61,6 @@ class _LoginPageState extends State<LoginPage> {
             onPressed: () => oauthButtonHandler(userBloc, 'google'),
             child: const Text('Login with Google'),
           ),
-          FilledButton(
-            onPressed: () => oauthButtonHandler(userBloc, 'facebook'),
-            child: const Text('Login with Facebook'),
-          ),
         ],
       ),
     );

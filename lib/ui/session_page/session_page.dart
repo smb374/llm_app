@@ -70,10 +70,6 @@ class _SessionPageState extends State<SessionPage> {
           generalAlert(context, 'Failed to create session', state.error);
         } else if (state is RequestFailed<SessionState, SessionDelete>) {
           generalAlert(context, 'Failed to delete session', state.error);
-        } else if (state
-            is RequestFailed<SessionState, SessionCreateWithReport>) {
-          generalAlert(
-              context, 'Failed to create session with report', state.error);
         } else if (state is SessionCaptionUpdate) {
           if (_sessionMap.containsKey(state.sessionId)) {
             setState(() {
