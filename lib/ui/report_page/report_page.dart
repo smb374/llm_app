@@ -80,8 +80,8 @@ class _ReportPageState extends State<ReportPage> {
                         onPressed: () {
                           ReportBase repBase = resp.response.reportBase;
                           BlocProvider.of<SessionBloc>(context).add(
-                              SessionCreateWithReport(widget.token!,
-                                  '${repBase.caseNum} ${repBase.issue}'));
+                              SessionCreateWithReport(
+                                  widget.token!, repBase.identifier));
                           ScaffoldMessenger.of(context)
                               .showSnackBar(const SnackBar(
                             content:
