@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:llm_app/blocs/blocs.dart';
-import 'package:llm_app/blocs/page.dart';
 import 'package:llm_app/models.dart';
 
 class MainDrawer extends StatelessWidget {
@@ -31,15 +30,11 @@ class MainDrawer extends StatelessWidget {
               profile != null ? profile!.email : 'unknown',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            currentAccountPicture: const FlutterLogo(),
-          ),
-          ListTile(
-            leading: const Icon(Icons.list),
-            title: const Text('Sessions'),
-            onTap: () {
-              scaffold.openEndDrawer();
-              pageBloc.add(SwitchSession());
-            },
+            // currentAccountPicture: const FlutterLogo(),
+            currentAccountPicture: const Image(
+              image: AssetImage('assets/pinglex-logo-drawer.png'),
+            ),
+            currentAccountPictureSize: const Size(160.0, 96.0),
           ),
           ListTile(
             leading: const Icon(Icons.search),
@@ -47,6 +42,14 @@ class MainDrawer extends StatelessWidget {
             onTap: () {
               scaffold.openEndDrawer();
               pageBloc.add(SwitchSearch());
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.list),
+            title: const Text('Sessions'),
+            onTap: () {
+              scaffold.openEndDrawer();
+              pageBloc.add(SwitchSession());
             },
           ),
           ListTile(

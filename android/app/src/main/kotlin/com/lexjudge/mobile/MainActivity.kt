@@ -1,4 +1,4 @@
-package com.example.llm_app
+package com.lexjudge.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

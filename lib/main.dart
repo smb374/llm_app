@@ -36,10 +36,13 @@ class _MyAppState extends State<MyApp> {
         child: MaterialApp(
           title: 'LLM App Example',
           theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFFEA5F33),
+              primary: const Color(0xFFEA5F33),
+            ),
             useMaterial3: true,
           ),
-          home: const MyHomePage(title: 'LLM App Home Page'),
+          home: const MyHomePage(title: 'PingLex'),
         ));
   }
 }
@@ -111,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 _refreshToken = state.resp.refreshToken;
               });
               userBloc.add(Profile(_token!));
-              pageBloc.add(SwitchSession());
+              pageBloc.add(SwitchSearch());
             } else if (state is RequestSuccess<UserState, User>) {
               setState(() {
                 _profile = state.resp;
@@ -161,8 +164,15 @@ class _MyHomePageState extends State<MyHomePage> {
       ],
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('LLM Test App'),
-          // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: const Text('LexJudge Mobile'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Colors.white,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Image.asset('assets/pinglex-logo-white.png'),
+            ),
+          ],
         ),
         drawer: (_profile != null && _token != null)
             ? MainDrawer(_token!, _profile!)
@@ -183,22 +193,6 @@ class _MyHomePageState extends State<MyHomePage> {
             }
           },
         ),
-        floatingActionButton:
-            BlocBuilder<PageBloc, PageState>(builder: (context, state) {
-          switch (state) {
-            case PageState.session:
-              return FloatingActionButton(
-                onPressed: () {
-                  BlocProvider.of<SessionBloc>(context)
-                      .add(SessionCreate(_token!));
-                },
-                tooltip: 'Create session',
-                child: const Icon(Icons.add),
-              );
-            default:
-              return Container();
-          }
-        }),
       ),
     );
   }

@@ -55,7 +55,7 @@ class _LoginContentState extends State<LoginContent> {
             ),
             onChanged: (value) {
               setState(() {
-                _email = EmailInput.dirty(value: value);
+                _email = EmailInput.dirty(value: value.trim());
               });
             },
           ),

@@ -78,9 +78,10 @@ class _ReportPageState extends State<ReportPage> {
                         tooltip: 'Create session with this report',
                         child: const Icon(Icons.add),
                         onPressed: () {
+                          ReportBase repBase = resp.response.reportBase;
                           BlocProvider.of<SessionBloc>(context).add(
                               SessionCreateWithReport(widget.token!,
-                                  resp.response.reportBase.identifier));
+                                  '${repBase.caseNum} ${repBase.issue}'));
                           ScaffoldMessenger.of(context)
                               .showSnackBar(const SnackBar(
                             content:

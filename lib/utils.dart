@@ -20,6 +20,7 @@ Future<Either<ErrorResponse, Response>> generalRequest<T>(
   if (headers != null) {
     headers.forEach((k, v) => req.headers[k] = v);
   }
+  req.headers['ngrok-skip-browser-warning'] = '1';
   if (body != null) {
     req.body = jsonEncode(body);
   }
@@ -33,6 +34,7 @@ Future<Either<ErrorResponse, Response>> generalRequest<T>(
 
   final resp = await Response.fromStream(await result.right);
   if (resp.statusCode < 200 || resp.statusCode >= 300) {
+    print(resp.body);
     final body = ErrorResponse.fromJson(jsonDecode(resp.body));
     final error =
         'API Request to endpoint "$endpoint" failed with status ${resp.statusCode}: ${body.error}';
