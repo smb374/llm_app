@@ -34,11 +34,21 @@ Future<Either<ErrorResponse, Response>> generalRequest<T>(
 
   final resp = await Response.fromStream(await result.right);
   if (resp.statusCode < 200 || resp.statusCode >= 300) {
-    print(resp.body);
-    final body = ErrorResponse.fromJson(jsonDecode(resp.body));
-    final error =
-        'API Request to endpoint "$endpoint" failed with status ${resp.statusCode}: ${body.error}';
-    return Left(ErrorResponse(error, body.refresh));
+    final contentType = resp.headers['content-type'];
+    if (contentType == 'application/json') {
+      final body = ErrorResponse.fromJson(jsonDecode(resp.body));
+      final error =
+          'API Request to endpoint "$endpoint" failed with status ${resp.statusCode}: ${body.error}';
+      return Left(ErrorResponse(error, body.refresh));
+    } else if (contentType == 'text/html') {
+      final error =
+          'API Request to endpoint "$endpoint" failed with status ${resp.statusCode}: Proxy to server failed.';
+      return Left(ErrorResponse(error, false));
+    } else {
+      final error =
+          'API Request to endpoint "$endpoint" failed with status ${resp.statusCode}: Unknown Error';
+      return Left(ErrorResponse(error, false));
+    }
   }
   return Right(resp);
 }

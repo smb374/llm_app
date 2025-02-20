@@ -35,6 +35,7 @@ class _MyAppState extends State<MyApp> {
         ],
         child: MaterialApp(
           title: 'LLM App Example',
+          color: Colors.white,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
               seedColor: const Color(0xFFEA5F33),
