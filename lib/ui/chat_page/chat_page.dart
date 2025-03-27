@@ -85,7 +85,7 @@ class _ChatPageState extends State<ChatPage> {
               _nextMessage = '';
             });
             state.resp.forEach((progress) async {
-              if (progress.error != null) {
+              if (progress.error != "") {
                 await generalAlert(context,
                     'Error occurred during chat progress', progress.error!);
               } else if (progress.end) {
@@ -97,9 +97,12 @@ class _ChatPageState extends State<ChatPage> {
                 _scrollController
                     .jumpTo(_scrollController.position.maxScrollExtent);
               } else {
-                setState(() {
-                  _nextMessage = _nextMessage! + progress.data!.message.content;
-                });
+                var content = progress.data?.message.content;
+                if (content != null) {
+                  setState(() {
+                    _nextMessage = _nextMessage! + content;
+                  });
+                }
                 _scrollController
                     .jumpTo(_scrollController.position.maxScrollExtent);
               }

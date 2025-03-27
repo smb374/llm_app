@@ -33,6 +33,7 @@ Future<Either<ErrorResponse, Response>> generalRequest<T>(
   }
 
   final resp = await Response.fromStream(await result.right);
+  print("OK");
   if (resp.statusCode < 200 || resp.statusCode >= 300) {
     final contentType = resp.headers['content-type'];
     if (contentType == 'application/json') {

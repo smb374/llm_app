@@ -251,7 +251,7 @@ ChatProgress _$ChatProgressFromJson(Map<String, dynamic> json) =>
               (v) => v == null
                   ? null
                   : ChatData.fromJson(v as Map<String, dynamic>)),
-          $checkedConvert('error', (v) => v as String?),
+          $checkedConvert('error', (v) => v as String),
           $checkedConvert('end', (v) => v as bool),
         );
         return val;

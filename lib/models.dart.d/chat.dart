@@ -29,7 +29,7 @@ class ChatData with EquatableMixin {
 @JsonSerializable(checked: true)
 class ChatProgress with EquatableMixin {
   final ChatData? data;
-  final String? error;
+  final String error;
   final bool end;
 
   ChatProgress(this.data, this.error, this.end);
